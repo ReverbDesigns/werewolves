@@ -1,1 +1,1 @@
-web = npm start
+npm install --save socket.ioweb = npm start
