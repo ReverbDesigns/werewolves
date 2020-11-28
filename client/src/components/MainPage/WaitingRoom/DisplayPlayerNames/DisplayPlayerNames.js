@@ -1,36 +1,21 @@
 import React, { Component } from 'react'
 import socketIOClient from 'socket.io-client'
 
-import "./DisplayPlayerNames.css"
-
-import serverUrl from '../../../../serverUrl'
-
-let DisplayPlayerNamesSocket
+const serverUrl = 'https://werewolf01.herokuapp.com/'
 
 class DisplayPlayerNames extends Component{
-    _isMounted = false
-
     state = {
         renderPlayerNames: null
     }
 
     componentDidMount(){
-        this._isMounted = true
-
-        DisplayPlayerNamesSocket = socketIOClient(serverUrl + 'main-page')
-        DisplayPlayerNamesSocket.on('connect', () => {
-            DisplayPlayerNamesSocket.emit('RequestToGetPlayersAndJoinRoom', this.props.roomid)
-        })
-
-        DisplayPlayerNamesSocket.on('GetBroadCastPlayers', data => 
-        {
-            if(this._isMounted)
-                this.setState({renderPlayerNames: data.map(player => {return(<div key = {player} className="player-name-holder"><p>{player}</p></div>)})})
-        })
-    }
-
-    componentWillUnmount(){
-        this._isMounted = false
+        const socket = socketIOClient(serverUrl + 'main-page', {
+            query: {
+                roomid : this.props.roomid
+            }
+        } )
+        socket.on('GetPlayers', data => {this.setState({renderPlayerNames: data.map(player => {return(<div key = {player}><p>{player}</p></div>)})})})
+        
     }
 
     render(){
@@ -43,4 +28,4 @@ class DisplayPlayerNames extends Component{
 }
 
 
-export {DisplayPlayerNames, DisplayPlayerNamesSocket}
+export default DisplayPlayerNames

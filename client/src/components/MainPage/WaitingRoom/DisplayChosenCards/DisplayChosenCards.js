@@ -2,68 +2,45 @@ import React, { Component } from 'react'
 
 import socketIOClient from 'socket.io-client'
 
-import serverUrl from '../../../../serverUrl'
+const serverUrl = 'https://werewolf01.herokuapp.com/'
 
-import './DisplayChosenCards.css'
+let cards = []
 
-let GetCurrentRolesSocket
-
-class DisplayChosenCards extends Component{
-    _isMounted = false
-
+class DisplayCards extends Component {
     state = {
-        renderChosenCards: null
+        renderCards: null
+    }
+
+    hideCardBttn = (index, e) => {
+        console.log(index)
     }
 
     componentDidMount(){
-        this._isMounted = true
+        const socket = socketIOClient(serverUrl + 'get-cards')
 
-        if(this._isMounted){
-            GetCurrentRolesSocket = socketIOClient(serverUrl + 'get-current-roles')
-        
-            GetCurrentRolesSocket.on('connect', () => {
-                GetCurrentRolesSocket.emit('JoinRoom', this.props.roomid)
+        socket.on('GetCards', data => {
+            this.setState({
+                renderCards: data.map( (card, index) => {
+                    let cardId = "card " + index
+                    return(
+                        <div key = {card.cardName}>
+                            <button type='button' onClick={this.hideCardBttn.bind(this, index)} id={cardId}>{card.cardName}</button>
+                        </div>
+                    )
+                })
             })
 
-            GetCurrentRolesSocket.on('GetSelectedCards', data => {
-                if(data !== null){
-                    let cards = []
-
-                    for(var key in data){
-                        if(data.hasOwnProperty(key)){
-                            if(data[key] > 0)
-                                cards.push(key + ' x' + data[key])
-                        }
-                    }
-                    this.setState({
-                        renderChosenCards: cards.map((data, index) => {
-                            let key = 'chosen-roles-' + index
-                            return(
-                                <div key={key} className="chosen-card-container">
-                                    <p>{data}</p>
-                                </div>
-                            )
-                        })
-                    })
-                }
-            })
-        }
-    }
-
-    componentWillUnmount(){
-        this._isMounted = false
+        })
     }
 
     render(){
         return(
             <>
-            <div className="display-chosen-cards">
-                {this.state.renderChosenCards}
-            </div>
-                
+                {this.state.renderCards}
             </>
         )
     }
 }
 
-export {DisplayChosenCards, GetCurrentRolesSocket}
+
+export default DisplayCards

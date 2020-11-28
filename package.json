@@ -7,7 +7,7 @@
   },
   "proxy": {
     "/socket.io": {
-      "target": "http://159.89.111.33:3001/",
+      "target": "https://werewolf01.herokuapp.com/",
       "ws": true
     }
   },

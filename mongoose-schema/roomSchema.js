@@ -4,7 +4,7 @@ const { Timestamp } = require('mongodb')
 var roomSchema = new mongoose.Schema({
     roomid: String,
     admin: String,
-    timeCreated: Timestamp,
+    timeCreated: Number,
     numberOfPlayers: Number,
     players: [String],
     totalPlayers: [String],
